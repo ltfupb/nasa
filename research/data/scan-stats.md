@@ -28,7 +28,18 @@ Total findings: ~1265 + ~850 (most are hygiene, not exploitable).
 
 Verified secret leaks across 18 audited repos + full-history rescan of `nasa/cumulus` and `nasa/apod-api`: **0**.
 
-Unverified candidates in cumulus full-history scan: 59 `SnykKey` (UUID test fixtures) + 4 `Box` (package-lock.json integrity hashes). All confirmed false positives by Trufflehog's live verification step.
+Unverified candidates in `nasa/cumulus` full-history scan (93 total, all false positives or intentional test fixtures, none verified live):
+
+| Detector | Count | Disposition |
+|---|---:|---|
+| SnykKey | 68 | UUID strings in Snyk-bot–authored commits and lockfiles (not real Snyk API keys; verification returned 403) |
+| FTP | 7 | `ftp://testuser:testpass@127.0.0.1` in `bamboo/bootstrap-unit-tests.sh` and `travis-ci/start-local-services.sh` — localhost test loopback |
+| Box | 7 | `package-lock.json` integrity hashes that coincidentally match the Box token regex |
+| PrivateKey | 5 | RSA keys in `packages/test-data/keys/*.pem` and `packages/ingest/test/fixtures/ssh_client_rsa_key` — explicit test fixtures |
+| Circle | 4 | Hex strings in commit metadata and `README.md` (verification 403) |
+| Dockerhub | 2 | UUIDs in `app/views/docs.md` documentation |
+
+The committed test RSA keys are a *very* minor hygiene note: while clearly labeled as test fixtures, public test keys can become real-world keys the moment they're reused for any bootstrap (e.g., a localstack instance exposed to the internet). Standard remediation is to generate ephemeral test keys in CI rather than commit them. Not VDP-reportable.
 
 ## Dependency confusion
 
