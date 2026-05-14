@@ -3,3 +3,5 @@ research/data/th_*.json
 research/data/zizmor*.json
 research/data/zizmor*.err
 research/data/trufflehog.out
+research/poc/node_modules/
+research/poc/package-lock.json
